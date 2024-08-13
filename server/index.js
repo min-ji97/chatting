@@ -32,7 +32,7 @@ io.on('connection', (socket) =>{
     let userStatus = false;  // 유저 있냐
 
     console.log('-----connection-----');
-
+    
     socket.on("init", (payload)=>{
         console.log('서버의 init', payload);
     });

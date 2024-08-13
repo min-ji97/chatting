@@ -1,35 +1,49 @@
 import logo from './logo.svg';
 import './css/Login.css';
-import socketIoClient from 'socket.io-client';
+
+import { socket } from './socket';
+// import socketIoClient from 'socket.io-client';
 import React, { useState, useEffect } from 'react';
 
-const ENDPOINT = "http://127.0.0.1:5000";
+
+// const ENDPOINT = "http://127.0.0.1:5000";
 
 
-function Login() {
+function Login( { setUserName }) {
 
-  const [ userName , setUserName ] = useState("");
+  const [ inputUserName , setInputUserName ] = useState("");
+  // const [ userName , setUserName ] = useState("");
   // const [ message , setMessage ] = useState("");
-  const [socket, setSocket] = useState(null);
+  // const [socket, setSocket] = useState(null);
 
   
-
   // 컴포넌트가 렌더링될 때마다 새로운 소켓 생성 막을라고!
-  useEffect(()=>{
-    const newSocket = socketIoClient(ENDPOINT);
-    setSocket(newSocket);
+  // useEffect(()=>{
+  //   const newSocket = socketIoClient(ENDPOINT);
+  //   setSocket(newSocket);
 
-    return() => newSocket.disconnect();
-  },[]);
+  //   return() => newSocket.disconnect();
+  // },[setSocket]);  
 
 
   const clickUserName = () =>{
 
-    if(userName.trim()){
-      
-      socket.emit('add user',userName, ()=>{
+    if(inputUserName.trim()){
+      setUserName(inputUserName);
+
+
+      // setSocket( tempSocket =>{
+      //   tempSocket.emit('add user',inputUserName,()=>{
+      //     console.log('채팅에 참여 가능합니다!');
+      //   });
+      //   return tempSocket;
+      // });
+
+      socket.emit('add user',inputUserName,()=>{
         console.log('채팅에 참여 가능합니다!');
       });
+
+
     }else{
       alert("닉네임을 입력해주세요");
     }
@@ -38,7 +52,7 @@ function Login() {
 
   
   const onChange = (e) =>{
-    setUserName(e.target.value);
+    setInputUserName(e.target.value);
   }
 
   return (
@@ -53,7 +67,7 @@ function Login() {
           if(e.key === "Enter") clickUserName();
         }}
         onChange={onChange}
-        value={userName}
+        value={inputUserName}
         />
       <button onClick={clickUserName}>입력</button>
       </header>
