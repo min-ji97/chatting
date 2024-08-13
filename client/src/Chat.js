@@ -12,8 +12,8 @@ import { socket } from './socket';
 const Chat = ({ userName }) =>{
 
     const [response, setResponse] = useState(""); 
-    const [ chatArr, setChatArr] = useState([]);
-
+    const [ messageList, setMessageList] = useState([]);
+    const [ chatWho , setChatWho] = useState([]);
 
     // const [socket, setSocket] = useState(null);
 
@@ -37,6 +37,9 @@ const Chat = ({ userName }) =>{
     
     useEffect(() =>{
        
+        socket.on('connect', () => {
+            console.log('클라이언트: 소켓 연결 성공!');
+        })
         socket.on("FromAPI", data=>{
             console.log('클라이언트의 : FromAPI');
             setResponse(data);
@@ -50,37 +53,53 @@ const Chat = ({ userName }) =>{
        
 
         socket.on('login',(data)=>{
-            console.log('클라이언트의 로그인입니다! 데이터 잘 받아왔나유!');
-            console.log(data);
+            setChatWho(chatWho.concat(data.userName));
         });
+        // socket.on('connect_error', (error) => {
+        //     console.log('Connection Error:', error);
+        // });
+        
+        // socket.on('reconnect_attempt', () => {
+        //     console.log('Trying to reconnect...');
+        // });
 
-
-        return () => {
-            socket.disconnect();  // 컴포넌트 언마운트 시 소켓 연결 해제
-        };   
+        // return () => {
+        //     socket.disconnect();  // 컴포넌트 언마운트 시 소켓 연결 해제
+        // };   
 
         // socket.on()
+
+        return () =>{
+            socket.off('login');
+        }
 
     },[socket]);
 
     const sendMessageHandler = (e) =>{
+        console.log(e);
         socket.emit("send message",{
             // author: userName,
         })
     }
-
+    const onChange = (e)=>{
+        setMessageList(e.target.value);
+    }
     return(
         <div>
             <div className='chat--container'>
                 <div className='chat--box'>
-                    <span>{`${userName}님이 입장하셨습니다.`}</span>
+                    
+                    <span>{`${chatWho}님이 입장하셨습니다.`}</span>
                 </div>
                 <input className='chat--input' type="text" 
                 placeholder='메시지를 입력해주세요'
-          
+
                 onKeyDown={(e)=>{
-                    e.key === "Enter" && sendMessageHandler();
-                }} />
+                    if( e.key === "Enter") sendMessageHandler();
+                }} 
+                onChange={onChange}
+                value={messageList}
+                />
                 <button onClick={sendMessageHandler}>전송</button>
 
             </div>

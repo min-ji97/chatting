@@ -16,7 +16,9 @@ const server = http.createServer(app);
 const io = socketio(server,{
     cors: {
         origin: "http://localhost:3000",
-        methods: ["GET","POST"]
+        methods: ["GET","POST"],
+        allowedHeaders: ["my-custom-header"],
+        credentials: true
     }
 });
 
@@ -28,7 +30,7 @@ app.use(router);
 // 접속한 사람의 수
 let userNum = 0;
 
-io.on('connection', (socket) =>{
+io.on('connection', async (socket) =>{
     let userStatus = false;  // 유저 있냐
 
     console.log('-----connection-----');
@@ -54,18 +56,20 @@ io.on('connection', (socket) =>{
         socket.userNum = userNum;
         userStatus = true;
         console.log(`${socket.userName}님의 번호는 ${socket.userNum} /// ${userNum}`);
-        socket.emit('login',{ userName : socket.userName })
-
+        socket.userName = userName;
+   
+        socket.broadcast.emit('login',{ userName });
+    
         // socket.emit('username confirmed', { username: socket.username })
-
     })
     socket.on('join', ({name, room}, callback) => {});
 
     socket.emit('FromAPI', 'Hello from the server!');
 
-    socket.on('disconnect', () => {
-        console.log('유저가 나갔습니다');
-    })
+    // socket.on('disconnect', (reason) => {
+    //     console.log('유저가 나갔습니다');
+    //     console.log('나간이유는!', reason);
+    // })
 })
 
 
