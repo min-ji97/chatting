@@ -61,6 +61,12 @@ io.on('connection', async (socket) =>{
         socket.broadcast.emit('login',{ userName });
     
         // socket.emit('username confirmed', { username: socket.username })
+    });
+    socket.on('send message',({userName , msg})=>{
+        socket.userName = userName;
+        socket.msg = msg;
+        console.log('여기는 서버의 유저네임과 메세지를 확인합니당', userName , msg);
+        socket.broadcast.emit('receive message',{ userName, msg  });
     })
     socket.on('join', ({name, room}, callback) => {});
 

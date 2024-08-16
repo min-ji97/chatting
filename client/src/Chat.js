@@ -14,6 +14,7 @@ const Chat = ({ userName }) =>{
     const [response, setResponse] = useState(""); 
     const [ messageList, setMessageList] = useState([]);
     const [ chatWho , setChatWho] = useState([]);
+    const [ msg , setMsg ] = useState(""); 
 
     // const [socket, setSocket] = useState(null);
 
@@ -55,6 +56,14 @@ const Chat = ({ userName }) =>{
         socket.on('login',(data)=>{
             setChatWho(chatWho.concat(data.userName));
         });
+
+        socket.on('receive message', ( data )=>{
+            console.log('리시브 메세지!', data);
+        })
+
+        ///아.........브로드캐스트가 나한테는 안온다야................ 서울다녀와서 제일먼저 알아볼것..
+
+
         // socket.on('connect_error', (error) => {
         //     console.log('Connection Error:', error);
         // });
@@ -75,14 +84,15 @@ const Chat = ({ userName }) =>{
 
     },[socket]);
 
-    const sendMessageHandler = (e) =>{
-        console.log(e);
-        socket.emit("send message",{
-            // author: userName,
-        })
+    const sendMessageHandler = () =>{
+        console.log(msg);
+        console.log(userName);
+        socket.emit("send message",{ userName  , msg });
+
+        setMsg(""); //  메세지창 입력하고 엔터치면 지워지게  해주려고!
     }
     const onChange = (e)=>{
-        setMessageList(e.target.value);
+        setMsg(e.target.value);
     }
     return(
         <div>
@@ -98,7 +108,7 @@ const Chat = ({ userName }) =>{
                     if( e.key === "Enter") sendMessageHandler();
                 }} 
                 onChange={onChange}
-                value={messageList}
+                // value={msg}
                 />
                 <button onClick={sendMessageHandler}>전송</button>
 
